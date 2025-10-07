@@ -82,6 +82,7 @@ export const login = async (req, res) => {
       id: user.user_id,
       name: user.name,
       email: user.email,
+      role:user.role,
     };
 
     const access_secret_key = process.env.access_secret_key;
@@ -114,15 +115,15 @@ export const login = async (req, res) => {
   }
 };
 
-export const profile = (req, res) => {
-  const data = req.user;
-  console.log(data.email);
+// export const profile = (req, res) => {
+//   const data = req.user;
+//   console.log(data.email);
 
-  res.status(200).json({
-    message: "welcome user we are on profile",
-    data: data.email,
-  });
-};
+//   res.status(200).json({
+//     message: "welcome user we are on profile",
+//     data: data.email,
+//   });
+// };
 
 export const logout = (req, res) => {
   res.clearCookie("accessToken");

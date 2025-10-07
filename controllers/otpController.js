@@ -66,6 +66,6 @@ export const verifyOtp = async (req, res) => {
     res.json({ message: "Email verified successfully!" });
   } catch (error) {
     res.status(500).json({ error: error.message });
- 
+    
   }
 };

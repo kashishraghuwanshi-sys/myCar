@@ -12,6 +12,7 @@ export const validateAccessToken = async (req, res, next) => {
     const access_secret_key = process.env.access_secret_key;
     const verifyAccessToken = jwt.verify(accessToken, access_secret_key);
 
+
     req.user = verifyAccessToken;
   } catch (err) {
     console.log(err);
@@ -38,7 +39,8 @@ export const validateRefreshToken = (req, res, next) => {
     const payload ={
       id:data.id,
       name:data.name,
-      email:data.email
+      email:data.email,
+      role:data.role,
     }
 
     req.user = data;
