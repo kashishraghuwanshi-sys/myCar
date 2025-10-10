@@ -1,7 +1,10 @@
+
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
+
 import authRelatedRoutes from "./routes/authRoutes.js"
 import otpRelatedRoutes from "./routes/otpRoutes.js"
 import adminRelatedRoutes from "./routes/adminRoutes.js";
@@ -11,7 +14,8 @@ import userCarRelatedRoutes from "./routes/userCarRoutes.js";
 import adminRentRelatedRoutes from "./routes/adminRentalRoutes.js"
 import userRentRelatedRoutes from "./routes/UserRentalRoutes.js"
 import paymentRelatedRoutes from "./routes/paymentRoutes.js"
-dotenv.config();
+import carRelatedRoutes from "./routes/carRoutes.js"
+import userRelatedRoutes from "./routes/UserRoutes.js"
 checkConnection();
 
 
@@ -37,7 +41,8 @@ app.use("/api/Usercar",userCarRelatedRoutes)
 app.use("/api/rentals",adminRentRelatedRoutes)
 app.use("/api/UserRentCar",userRentRelatedRoutes)
 app.use("/api/payment",paymentRelatedRoutes)
-
+app.use("/api/cars",carRelatedRoutes)
+app.use("/api/user",userRelatedRoutes)
 app.get("/", (req, res) => {
   res.send("Server is live ✅");
 });

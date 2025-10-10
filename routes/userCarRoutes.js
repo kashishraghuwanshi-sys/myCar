@@ -4,8 +4,8 @@ import { getAvailableCars, getCarDetails, searchCars } from "../controllers/user
 
 const router = express.Router();
 
-router.get("/cars",getAvailableCars)
-router.get("/cars/search",searchCars);
-router.get("/cars/:id",getCarDetails);
+router.get("/getAvailablecars",getAvailableCars)
+router.get("/search",searchCars);
+router.get("/:id",getCarDetails);
 
 export default router;

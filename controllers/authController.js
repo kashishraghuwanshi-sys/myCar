@@ -1,6 +1,6 @@
 import { pool } from "../config/db.js";
 import bcrypt from "bcrypt";
-import { notifyLogin } from "./twilioController.js";
+// import { notifyLogin } from "./twilioController.js";
 import { sendOtp , verifyOtp} from "./otpController.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -107,7 +107,7 @@ export const login = async (req, res) => {
       httpOnly: true,
     });
 
-    await notifyLogin(user);
+    // await notifyLogin(user);
 
     res.status(200).json({ message: "Login successful" });
   } catch (err) {

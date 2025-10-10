@@ -11,8 +11,8 @@ const router = express.Router();
 
 router.post("/register",RegisterValidation,validationErrorHandler,register)
 router.post("/login",login);
-router.get("/profile",validateAccessToken,getProfile)
-router.put("/profile",validateAccessToken,updateProfile)
+// router.get("/profile",validateAccessToken,getProfile)
+// router.put("/profile",validateAccessToken,updateProfile)
 router.get("/logout",logout)
 router.get("/refreshaccess",validateRefreshToken)
 

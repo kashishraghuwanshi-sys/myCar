@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
@@ -16,6 +17,8 @@
     "express-validator": "^7.2.1",
     "init": "^0.1.2",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.15.0",
     "nodemailer": "^7.0.6",
     "razorpay": "^2.9.6",
