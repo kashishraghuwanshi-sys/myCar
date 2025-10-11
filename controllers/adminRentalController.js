@@ -10,11 +10,21 @@ export const getAllRentals = async (req ,res)=>{
        JOIN cars c ON r.car_id = c.car_id
        ORDER BY r.created_at DESC`);
     
-    res.json(rentals);
+    res.status(200).json(
+    {
+       success: true,
+      message: "All rentals fetched successfully",
+      data: {
+        rentals
+      },
+    }
+    );
 }
 catch(err){
     res.status(500).json({
-        message: err.message
+        success:false,
+        message:"Failed to fetch rentals",
+        error:err.message,
     });
 }
 };
@@ -31,12 +41,15 @@ export const makeCarAvailable = async(req ,res)=>{
         );
 
         res.json({
-            message : " Car is now Availalbe"
+            success: true,
+            message : " Car is now Availalbe for rent again",
         });
     }
     catch(err){
         res.status(500).json({
-            message : err.message
+            success: false,
+            message: "Failed to make car available",
+            error : err.message,
         });
     }
 };
@@ -51,6 +64,7 @@ export const cancelRental = async (req ,res)=>{
         const [rental] = await pool.query("select car_id from rentals where rental_id=? ",[rental_id]);
         if(rental.length === 0){
             return res.status(404).json({
+                success: false,
                 message : "rental not found"
             });
         }
@@ -64,12 +78,15 @@ export const cancelRental = async (req ,res)=>{
         await pool.query("update cars Set status='Available' where car_id=?",[car_id]);
 
         res.json({
+            success: true,
             message: "Rental canceled and car is now available"
         });
     }
     catch(err){
         res.status(500).json({
-            message: err.message
+            success: false,
+            message: "Failed to cancel rental",
+            error: err.message
         });
     }
 };

@@ -18,8 +18,9 @@ export const createPayment = async (req ,res)=>{
 
     if(rental.length === 0){
       return res.status(404).json({
+        success: false,
         message: "Rental not found"
-      })
+      });
     }
 
     // payment simulation 
@@ -39,18 +40,22 @@ export const createPayment = async (req ,res)=>{
     
     
     res.status(200).json({
-      message:"✅ Payment successful (fake mode)",
+      success: true,
+      message: "✅ Payment successful (simulation mode)",
+      data:{
       rental_id,
       totalAmount,
       payment_status: "paid",
-
+      },
     });
 
   }
   catch(err){
     console.log("payment error:",err);
     res.status(500).json({
-      message: err.message
+      success: false,
+      message: "Payment failed",
+      error: err.message,
     });
   }
 };
@@ -94,12 +99,21 @@ export const refundPayment = async(req ,res)=>{
     ]);
  
      res.status(200).json({
+      success: true,
       message: "💸 Refund processed successfully (fake mode)",
-      rental_id,
+      data:{
+        rental_id,
+        car_id: rental[0].car_id,
+        payment_status: "Refunded",
+      }
     });
 }
 catch (err) {
     console.error("Refund Error:", err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      success: false, 
+      message: "Refund failed",
+      error: err.message,
+    });
   }
 };

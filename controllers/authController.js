@@ -1,10 +1,26 @@
 import { pool } from "../config/db.js";
 import bcrypt from "bcrypt";
 // import { notifyLogin } from "./twilioController.js";
-import { sendOtp , verifyOtp} from "./otpController.js";
+import { sendOtp} from "./otpController.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
+
+// Agar future me extra logic chahiye jaise JWT generate karna
+export const googleProfile = (req, res) => {
+    if (!req.user) 
+      return res.status(401).json
+    ({ 
+    success:false,
+    message: "Not logged in"
+   });
+  res.status(200).json({
+    success: true,
+    message: "User profile fetched successfully",
+    data: req.user 
+  });
+};
+
 
 export const register = async (req, res) => {
   try {
@@ -16,6 +32,7 @@ export const register = async (req, res) => {
     const [existing] = await pool.query(existQuery, [email]);
     if (existing.length > 0) {
       return res.status(400).json({
+        success: false,
         message: "User already exists",
       });
     }
@@ -38,16 +55,25 @@ export const register = async (req, res) => {
     const otpSent = await sendOtp(userId, email);
 
     if (!otpSent) {
-      return res.status(500).json({ message: "Failed to send OTP" });
+      return res.status(500).json({
+        success:false,
+         message: "Failed to send OTP"
+        });
     }
 
     res.status(201).json({
+      success:true,
       message: "user registered successfully pls verify otp",
     });
   } catch (err) {
     console.log(err);
+      res.status(500).json({
+      success: false,
+      message: "Registration failed",
+      error: err.message,
+    });
   }
-};
+  };
 
 export const login = async (req, res) => {
   try {
@@ -59,6 +85,7 @@ export const login = async (req, res) => {
     ]);
     if (users.length === 0) {
       return res.status(400).json({
+        success: false,
         message: "user not found",
       });
     }
@@ -68,13 +95,19 @@ export const login = async (req, res) => {
     if (!user.is_verified) {
       return res
         .status(400)
-        .json({ message: "Please verify your email first" });
+        .json({ 
+          success: false,
+          message: "Please verify your email first" 
+        });
     }
 
     //compare password
     const comparePassword = await bcrypt.compare(password, user.password);
     if (!comparePassword) {
-      return res.status(400).json({ message: "Incorrect password" });
+      return res.status(400).json({ 
+        success:false,
+        message: "Incorrect password" ,
+      });
     }
 
     //genrate token
@@ -106,27 +139,43 @@ export const login = async (req, res) => {
       sameSite: "strict",
       httpOnly: true,
     });
-
-    // await notifyLogin(user);
-
-    res.status(200).json({ message: "Login successful" });
+    res.status(200).json({
+      success:true,
+       message: "Login successful",
+       data:{
+         user: {
+          id: user.user_id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+        accessToken,
+        refreshToken,
+       } 
+      });
   } catch (err) {
     console.log(err);
+       res.status(500).json({
+      success: false,
+      message: "Login failed",
+      error: err.message,
+    });
   }
 };
 
-// export const profile = (req, res) => {
-//   const data = req.user;
-//   console.log(data.email);
-
-//   res.status(200).json({
-//     message: "welcome user we are on profile",
-//     data: data.email,
-//   });
-// };
-
 export const logout = (req, res) => {
-  res.clearCookie("accessToken");
-  // res.clearCookie("refreshToken")
-  res.status(200).json({ message: "Logout successful" });
+try{
+    res.clearCookie("accessToken");
+  res.clearCookie("refreshToken")
+  res.status(200).json({ 
+    success: true,
+    message: "Logout successful" });
+}
+catch(err){
+      res.status(500).json({
+      success: false,
+      message: "Logout failed",
+      error: err.message,
+    });
+  }
 };

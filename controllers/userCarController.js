@@ -7,9 +7,14 @@ export const getAvailableCars = async (req, res) => {
     const [cars] = await pool.query(
       "select * from cars where status = 'Available'"
     );
-    res.json(cars);
+    return res.status(200).json({
+      success: true,
+      count: cars.length,
+      data: cars,
+    });
   } catch (err) {
     res.status(500).json({
+      success: false,
       message: err.message,
     });
   }
@@ -48,9 +53,24 @@ export const searchCars = async (req, res) => {
     }
 
     const [cars] = await pool.query(query, params);
-    res.json(cars);
+
+     if (cars.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No cars found matching your criteria.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: cars.length,
+      data: cars,
+    });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ 
+      success: false,
+      message: error.message });
   }
 };
 
@@ -60,10 +80,19 @@ export const getCarDetails = async (req, res) => {
     const { id } = req.params;
     const [car] = await pool.query("SELECT * FROM cars WHERE car_id = ?", [id]);
     if (car.length === 0)
-      return res.status(404).json({ message: "Car not found" });
-    res.json(car[0]);
+    return res.status(404).json({ 
+    success: false,
+    message: "Car not found" 
+  });
+      return res.status(200).json({
+      success: true,
+      data: car[0],
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+       message: error.message
+       });
   }
 };
 

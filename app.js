@@ -4,6 +4,8 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import  session from "express-session";
+import passport from "./config/passport.js";
 
 import authRelatedRoutes from "./routes/authRoutes.js"
 import otpRelatedRoutes from "./routes/otpRoutes.js"
@@ -16,23 +18,43 @@ import userRentRelatedRoutes from "./routes/UserRentalRoutes.js"
 import paymentRelatedRoutes from "./routes/paymentRoutes.js"
 import carRelatedRoutes from "./routes/carRoutes.js"
 import userRelatedRoutes from "./routes/UserRoutes.js"
+
 checkConnection();
 
 
 const app = express();
 
-app.use((req, res, next) => {
-  // make ngrok skip the browser warning when someone visits (helps manual checks)
-  res.setHeader('ngrok-skip-browser-warning', 'true');
-  next();
-});
-
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
 
+app.use(
+  cors({
+    origin:  process.env.FRONTEND_URL || "http://localhost:5173" ,
+    credentials: true,
+  })
+);
 
 
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave:false,
+  saveUninitialized: false,
+     cookie: {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: "lax", // allows top-level redirects to set cookie in dev
+      secure: false,   
+      
+    },
+}));
+
+// Passport init
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+app.use("/auth",authRelatedRoutes)
 app.use("/api/auth",authRelatedRoutes)
 app.use("/api/mail",otpRelatedRoutes)
 app.use("/api/admin",adminRelatedRoutes)

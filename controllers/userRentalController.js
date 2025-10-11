@@ -19,7 +19,10 @@ export const bookCar = async (req, res) => {
     );
 
     if (carData.length === 0) {
-      return res.status(400).json({ message: "Car not available" });
+      return res.status(400).json({ 
+        success: false,
+        message: "Car not available"
+       });
     }
 
     // calculate rental days
@@ -29,7 +32,10 @@ export const bookCar = async (req, res) => {
     const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
 
     if (days <= 0) {
-      return res.status(400).json({ message: "Invalid rental period" });
+      return res.status(400).json({ 
+        success: false,
+        message: "Invalid rental period" 
+      });
     }
 
     const total_price = days * carData[0].rent_per_day;
@@ -48,12 +54,23 @@ export const bookCar = async (req, res) => {
     ]);
 
     res.json({
+      success: true,
       message: "car booked successfully",
-      total_price,
+           data: {
+        rental_id: rentalResult.insertId,
+        car_id,
+        total_price,
+        start_date,
+        end_date,
+        status: "Rented",
+      },
     });
   } catch (err) {
+    console.error("Book Car Error:", err);
     res.status(500).json({
-      message: err.message,
+      success: false,
+      message: "Failed to book car",
+      error: err.message,
     });
   }
 };
@@ -70,9 +87,18 @@ export const getUserRentals = async (req, res) => {
        ORDER BY r.created_at DESC`,
       [user_id]
     );
-    res.json(rentals);
+    res.status(200).json({
+      success: true,
+      count: rentals.length,
+      data: rentals,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Get User Rentals Error:", err);
+    res.status(500).json({
+      success: false,
+       message: "Failed to fetch user rentals",
+       error: err.message,
+       });
   }
 };
 
@@ -89,7 +115,10 @@ export const cancelRental = async (req, res) => {
     );
 
     if (rental.length === 0) {
-      return res.status(404).json({ message: "Rental not found" });
+      return res.status(404).json({
+        success: false,
+         message: "Rental not found"
+         });
     }
 
     const car_id = rental[0].car_id;
@@ -102,8 +131,19 @@ export const cancelRental = async (req, res) => {
       car_id,
     ]);
 
-    res.json({ message: "Rental canceled and car is now available" });
+    res.json({
+      success: true,
+       message: "Rental canceled and car is now available",
+       data:{
+        rental_id, car_id, status: "Cancelled" 
+       }
+       });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Cancel Rental Error:", err);
+    res.status(500).json({
+      success: false, 
+      message: "Failed to cancel rental",
+    error: err.message,
+  });
   }
 };

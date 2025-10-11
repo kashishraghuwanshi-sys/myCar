@@ -11,18 +11,23 @@ export const getProfile = async (req, res) => {
 
     if (data.length === 0) {
       return res.status(404).json({
+        success: false,
         message: "user not found",
       });
     }
     const user = data[0];
+
     res.status(200).json({
+      success: true,
       message: "user profile fetched successfully",
-      profile: user,
+      data: user,
     });
   } catch (err) {
-    console.log(err);
+    console.error("Get Profile Error:", err);
     res.status(500).json({
+      success: false,
       message: "Error fetching profile",
+      error: err.message,
     });
   }
 };
@@ -32,10 +37,11 @@ export const getProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { name, phone, password } = req.body;
+    const { name, phone, password ,image_url} = req.body;
 
-    if (!name && !phone && !password) {
+    if (!name && !phone && !password &&!image_url) {
       return res.status(400).json({
+        success: false,
         message: "Please provide data to update",
       });
     }
@@ -46,13 +52,17 @@ export const updateProfile = async (req, res) => {
     ]);
 
     if (data.length === 0) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ 
+        success: false,
+        message: "User not found"
+       });
     }
     const user = data[0];
 
     // naye values ya purane values
     const updatedName = name || user.name;
     const updatedPhone = phone || user.phone;
+    const updatedImage = image_url || user.image_url;
 
     let updatedPassword = user.password;
     if (password) {
@@ -63,16 +73,18 @@ export const updateProfile = async (req, res) => {
     //update query
     await pool.query(
       "update users set name=?,phone=?,password=? where user_id=?",
-      [updatedName, updatedPhone, updatedPassword, userId]
+      [updatedName, updatedPhone, updatedPassword,updatedImage, userId]
     );
 
     res.status(200).json({
+      success: true,
       message: "Profile updated successfully",
-      profile: {
+      data: {
         user_id: userId,
         name: updatedName,
         email: user.email, // email generally change nahi karte
         phone: updatedPhone,
+        image_url: updatedImage,
         role: user.role,
         is_verified: user.is_verified,
       },
@@ -80,7 +92,9 @@ export const updateProfile = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({
+      success: false,
       message: "error updating profile",
+      error: err.message,
     });
   }
 };

@@ -29,7 +29,9 @@ export const verifyOtp = async (req, res) => {
     const query = "select * from users where email =?";
     const [data] = await pool.query(query, [email]);
     if (data.length === 0) {
-      return res.status(400).json({ message: "User not found" });
+        return res.status(404).json({
+        success: false,
+        message: "User not found" });
     }
     const user = data[0]
     console.log(user);
@@ -40,21 +42,27 @@ export const verifyOtp = async (req, res) => {
 
     if(records.length === 0){
         return res.status(400).json({
-            message: "otp not found"
+          success: false,
+          message: "otp not found.please request a new one",
         })
     }
 
         const record = records[0];
-        console.log(record);
 
         //check expirey
     if(new Date(record.expires_at)<new Date()){
-       return res.status(400).json({ message: "OTP expired" }); 
+       return res.status(400).json({
+        success: false, 
+        message: "OTP expired .please request a new one.",
+       }); 
     }
 
     // check match
-    if (record.otp_code !== otp) {
-      return res.status(400).json({ message: "Invalid OTP" });
+    if (String(record.otp_code !== otp)) {
+      return res.status(400).json({ 
+        success: false,
+        message: "Invalid OTP.pelease try again.",
+       });
     }
     
     // update user verified
@@ -63,9 +71,23 @@ export const verifyOtp = async (req, res) => {
 
     await pool.query("DELETE FROM otps WHERE user_id=?", [user.user_id]);
    
-    res.json({ message: "Email verified successfully!" });
+    res.status(200).json({ 
+      success: true,
+      message: "Email verified successfully!" ,
+      data: {
+        user_id: user.user_id,
+        email: user.email,
+        name: user.name,
+      },
+
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Verify OTP error:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Error verifying Otp",
+      error: error.message 
+    });
     
   }
 };
