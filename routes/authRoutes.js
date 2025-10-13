@@ -1,5 +1,5 @@
 import express from "express";
-import {register,login , logout,googleProfile} from "../controllers/authController.js"
+import {register,login , logout,googleProfile, resetPassword,forgotPassword} from "../controllers/authController.js"
 import { validateRefreshToken , validateAccessToken } from "../middlewares/verifyToken.js";
 import { RegisterValidation } from "../validations/authValidations.js";
 import { validationErrorHandler } from "../middlewares/validationError.js";
@@ -27,5 +27,7 @@ router.get("/googleProfile",googleProfile)
 router.get("/logout",logout)
 router.get("/profile",getProfile)
 router.get("/refreshaccess",validateRefreshToken)
+router.post("/forgot-password", forgotPassword);
+router.post("/resetPassword",resetPassword)
 
 export default router;
