@@ -28,12 +28,12 @@ export const register = async (req, res) => {
   try {
     let { name, email, password, phone, role } = req.body;
 
-    //check if user existe
+    //check if user exists
 
     const existQuery = "select * from users where email = ?";
     const [existing] = await pool.query(existQuery, [email]);
     if (existing.length > 0) {
-      return res.status(400).json({
+      return res.status(200).json({
         success: false,
         message: "User already exists",
       });
@@ -83,7 +83,7 @@ export const login = async (req, res) => {
     // 🔹 Check user
     const [users] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);
     if (users.length === 0) {
-      return res.status(400).json({
+      return res.status(200).json({
         success: false,
         message: "User not found",
       });
@@ -93,7 +93,7 @@ export const login = async (req, res) => {
 
     // 🔹 Check if verified
     if (!user.is_verified) {
-      return res.status(400).json({
+      return res.status(200).json({
         success: false,
         message: "Please verify your email first",
       });
@@ -102,7 +102,7 @@ export const login = async (req, res) => {
     // 🔹 Compare password
     const comparePassword = await bcrypt.compare(password, user.password);
     if (!comparePassword) {
-      return res.status(400).json({
+      return res.status(200).json({
         success: false,
         message: "Incorrect password",
       });
