@@ -34,7 +34,7 @@ export const verifyOtp = async (req, res) => {
         message: "User not found" });
     }
     const user = data[0]
-    console.log(user);
+    // console.log(user);
 
     // get otp from db
 
@@ -57,8 +57,8 @@ export const verifyOtp = async (req, res) => {
        }); 
     }
 
-    // check match
-    if (String(record.otp_code !== otp)) {
+    // check match()
+    if (String(record.otp_code) !==(otp)) {
       return res.status(400).json({ 
         success: false,
         message: "Invalid OTP.pelease try again.",
