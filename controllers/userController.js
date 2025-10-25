@@ -5,7 +5,7 @@ export const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     const [data] = await pool.query(
-      "select user_id,name,email,phone,role,is_verified from users where user_id=?",
+      "select user_id,name,email,phone,role,is_verified,image_url from users where user_id=?",
       [userId]
     );
 
@@ -37,7 +37,8 @@ export const getProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { name, phone, password ,image_url} = req.body;
+    const { name, phone, password} = req.body;
+    const image_url = req.file ? `/uploads/${req.file.filename}` : null;
 
     if (!name && !phone && !password &&!image_url) {
       return res.status(400).json({
@@ -59,7 +60,6 @@ export const updateProfile = async (req, res) => {
     }
     const user = data[0];
 
-    // naye values ya purane values
     const updatedName = name || user.name;
     const updatedPhone = phone || user.phone;
     const updatedImage = image_url || user.image_url;
@@ -70,10 +70,9 @@ export const updateProfile = async (req, res) => {
       updatedPassword = await bcrypt.hash(password, salt);
     }
 
-    //update query
     await pool.query(
-      "update users set name=?,phone=?,password=? where user_id=?",
-      [updatedName, updatedPhone, updatedPassword,updatedImage, userId]
+      "UPDATE users SET name=?, phone=?, password=?, image_url=? WHERE user_id=?",
+      [updatedName, updatedPhone, updatedPassword, updatedImage, userId]
     );
 
     res.status(200).json({
@@ -82,11 +81,9 @@ export const updateProfile = async (req, res) => {
       data: {
         user_id: userId,
         name: updatedName,
-        email: user.email, // email generally change nahi karte
+        email: user.email,
         phone: updatedPhone,
         image_url: updatedImage,
-        role: user.role,
-        is_verified: user.is_verified,
       },
     });
   } catch (err) {

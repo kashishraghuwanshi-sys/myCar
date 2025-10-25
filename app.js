@@ -5,6 +5,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import  session from "express-session";
+import bodyParser from "body-parser";
 import passport from "./config/passport.js";
 
 import authRelatedRoutes from "./routes/authRoutes.js"
@@ -30,6 +31,8 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 
@@ -64,6 +67,7 @@ app.use("/api/UserRentCar",userRentRelatedRoutes)
 app.use("/api/payment",paymentRelatedRoutes)
 app.use("/api/cars",carRelatedRoutes)
 app.use("/api/user",userRelatedRoutes)
+app.use("/uploads", express.static("uploads"));
 app.get("/", (req, res) => {
   res.send("Server is live ✅");
 });
